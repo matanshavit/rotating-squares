@@ -23,6 +23,22 @@ function App() {
   const outerSquareXPadding = (outerSquareSide - outerRectangleWidth) / 2
   const outerSquareYPadding = (outerSquareSide - outerRectangleHeight) / 2
 
+  const isColliding = (index: number) => {
+    const squareBounds = squareBoundsStates[index][0]
+    return [
+      ...squareBoundsStates.slice(0, index),
+      ...squareBoundsStates.slice(index + 1),
+    ].some(squareBoundsState => {
+      const otherSquareBounds = squareBoundsState[0]
+      return (
+        squareBounds.left < otherSquareBounds.right &&
+        squareBounds.right > otherSquareBounds.left &&
+        squareBounds.top < otherSquareBounds.bottom &&
+        squareBounds.bottom > otherSquareBounds.top
+      );
+    })
+  }
+
   return (
     <>
       <div
@@ -49,6 +65,7 @@ function App() {
         <Square
           squareId={index.toString()}
           onUpdateSquareBounds={(squareBounds) => {squareBoundsState[1](squareBounds)}}
+          isColliding={() => isColliding(index)}
         />
       ))}
       <div

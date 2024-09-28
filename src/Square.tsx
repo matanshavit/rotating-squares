@@ -9,9 +9,10 @@ type SquareProps = {
     left: number,
     right: number,
   }) => void
+  isColliding?: () => boolean
 }
 
-function Square({squareId, onUpdateSquareBounds = ()=>{}}: SquareProps) {
+function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = ()=>false}: SquareProps) {
 
   const [squareBounds, setSquareBounds] = useState(
     {top: 0, bottom: 0, left: 0, right: 0,}
@@ -23,9 +24,14 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}}: SquareProps) {
 
   const fullSquareRef = useRef<HTMLDivElement>(null);
 
+  const GREEN = "#44FF99"
+  const RED = "#FF4499"
+  const [boundsBorderColor, setBoundsBorderColor] = useState(GREEN)
+
   const updateSquareBounds = () => {
     if (fullSquareRef.current !== null) {
       setSquareBounds(fullSquareRef.current.getBoundingClientRect())
+      setBoundsBorderColor(isColliding() ? RED : GREEN)
     }
   }
 
@@ -36,6 +42,10 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}}: SquareProps) {
     document.defaultView?.addEventListener('resize', updateSquareBounds)
     return () => document.defaultView?.removeEventListener('resize', updateSquareBounds)
   }, [])
+
+  const handleDrag = () => {
+    updateSquareBounds()
+  }
 
   const squareCenterX = (squareBounds.left + squareBounds.right) / 2
   const squareCenterY = (squareBounds.top + squareBounds.bottom) / 2
@@ -113,12 +123,12 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}}: SquareProps) {
         left: `${squareBounds.left - boundsBorderSize}px`,
         width: `${squareBounds.right - squareBounds.left}px`,
         height: `${squareBounds.bottom - squareBounds.top}px`,
-        border: `${boundsBorderSize}px #44FF99 solid`,
+        border: `${boundsBorderSize}px ${boundsBorderColor} solid`,
       }}
     />
     <Draggable
       handle={`#square-${squareId}`}
-      onDrag={updateSquareBounds}
+      onDrag={handleDrag}
       onStop={updateSquareBounds}
     ><div>
       <div
