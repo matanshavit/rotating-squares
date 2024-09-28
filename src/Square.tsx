@@ -9,10 +9,10 @@ type SquareProps = {
     left: number,
     right: number,
   }) => void
-  isColliding?: () => boolean
+  isColliding?: boolean
 }
 
-function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = ()=>false}: SquareProps) {
+function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = false}: SquareProps) {
 
   const [squareBounds, setSquareBounds] = useState(
     {top: 0, bottom: 0, left: 0, right: 0,}
@@ -24,14 +24,9 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = ()=>fals
 
   const fullSquareRef = useRef<HTMLDivElement>(null);
 
-  const GREEN = "#44FF99"
-  const RED = "#FF4499"
-  const [boundsBorderColor, setBoundsBorderColor] = useState(GREEN)
-
   const updateSquareBounds = () => {
     if (fullSquareRef.current !== null) {
       setSquareBounds(fullSquareRef.current.getBoundingClientRect())
-      setBoundsBorderColor(isColliding() ? RED : GREEN)
     }
   }
 
@@ -114,6 +109,9 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = ()=>fals
 
   const boundsBorderSize = 4;
 
+  const GREEN = "#44FF99"
+  const RED = "#FF4499"
+
   return (
     <>
     <div
@@ -123,7 +121,7 @@ function Square({squareId, onUpdateSquareBounds = ()=>{}, isColliding = ()=>fals
         left: `${squareBounds.left - boundsBorderSize}px`,
         width: `${squareBounds.right - squareBounds.left}px`,
         height: `${squareBounds.bottom - squareBounds.top}px`,
-        border: `${boundsBorderSize}px ${boundsBorderColor} solid`,
+        border: `${boundsBorderSize}px ${isColliding ? RED : GREEN} solid`,
       }}
     />
     <Draggable

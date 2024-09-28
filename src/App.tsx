@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Square from './Square';
 import './App.css';
 
@@ -23,7 +23,7 @@ function App() {
   const outerSquareXPadding = (outerSquareSide - outerRectangleWidth) / 2
   const outerSquareYPadding = (outerSquareSide - outerRectangleHeight) / 2
 
-  const isColliding = (index: number) => {
+  const isColliding = useCallback((index: number) => {
     const squareBounds = squareBoundsStates[index][0]
     return [
       ...squareBoundsStates.slice(0, index),
@@ -37,7 +37,7 @@ function App() {
         squareBounds.bottom > otherSquareBounds.top
       );
     })
-  }
+  }, [squareBoundsStates])
 
   return (
     <>
@@ -65,7 +65,7 @@ function App() {
         <Square
           squareId={index.toString()}
           onUpdateSquareBounds={(squareBounds) => {squareBoundsState[1](squareBounds)}}
-          isColliding={() => isColliding(index)}
+          isColliding={isColliding(index)}
         />
       ))}
       <div
