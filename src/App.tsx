@@ -1,43 +1,27 @@
 import { useCallback, useState } from 'react';
 import Square from './Square';
 import './App.css';
+import { SquaresContextProvider, useSquaresContext } from './SquaresContext';
 
 function App() {
 
-  const squareCount = 5
-  const squareBoundsStates = [...Array(squareCount)].map(() => (
-    useState({top: 0, bottom: 0, left: 0, right: 0,})
-  ))
+  const squaresContext = useSquaresContext();
 
-  const outerRectangle = {
-    top: Math.min(...squareBoundsStates.map(squareBoundsState => squareBoundsState[0].top)),
-    bottom: Math.max(...squareBoundsStates.map(squareBoundsState => squareBoundsState[0].bottom)),
-    left: Math.min(...squareBoundsStates.map(squareBoundsState => squareBoundsState[0].left)),
-    right: Math.max(...squareBoundsStates.map(squareBoundsState => squareBoundsState[0].right)),
+  if (!squaresContext) {
+    return <></>
   }
-  const outerRectangleWidth = outerRectangle.right - outerRectangle.left
-  const outerRectangleHeight = outerRectangle.bottom - outerRectangle.top
-  const outerRectangleBorderSize = 16
 
-  const outerSquareSide = Math.max(outerRectangleWidth, outerRectangleHeight)
-  const outerSquareXPadding = (outerSquareSide - outerRectangleWidth) / 2
-  const outerSquareYPadding = (outerSquareSide - outerRectangleHeight) / 2
-
-  const isColliding = useCallback((index: number) => {
-    const squareBounds = squareBoundsStates[index][0]
-    return [
-      ...squareBoundsStates.slice(0, index),
-      ...squareBoundsStates.slice(index + 1),
-    ].some(squareBoundsState => {
-      const otherSquareBounds = squareBoundsState[0]
-      return (
-        squareBounds.left < otherSquareBounds.right &&
-        squareBounds.right > otherSquareBounds.left &&
-        squareBounds.top < otherSquareBounds.bottom &&
-        squareBounds.bottom > otherSquareBounds.top
-      );
-    })
-  }, [squareBoundsStates])
+  const {
+    squareBoundsStates,
+    outerRectangle,
+    outerRectangleWidth,
+    outerRectangleHeight,
+    outerSquareXPadding,
+    outerSquareYPadding,
+    outerRectangleBorderSize,
+    outerSquareSide,
+    isColliding,
+  } = squaresContext;
 
   return (
     <>
@@ -90,4 +74,10 @@ function App() {
   )
 }
 
-export default App
+const WrappedApp = () => (
+  <SquaresContextProvider>
+    <App />
+  </SquaresContextProvider>
+)
+
+export default WrappedApp
